@@ -23,33 +23,13 @@ async def alive() -> str:
     return "Service is living the dream and hopefully doing well"
 
 
-@app.post("/generate", response_class=FileResponse)
-async def generate(
-    description: dlhm_types.MotionDescription, model: Optional[dlhm_types.ModelInput] = Body(default=None)
-) -> FileResponse:
-    if not description.data:
-        raise ValueError("Motion description data cannot be empty")
+# @app.post("/upload", respone_class)
 
-    request_id: str = str(uuid.uuid4())
-    path = os.path.join(DEFAULT_OUTPUT_DIR, f"{request_id}.mp4")
 
-    text_inputs = []
-    dur_inputs = []
-    for a, b in description.data:
-        text_inputs.append(a)
-        dur_inputs.append(b)
+# @app.post("/generate")
 
-    command = [
-        "python",
-        "interact_teach.py",
-        f"folder={EXPERIMENT_PATH}",
-        "output=/hm_output",
-        'texts=["' + '", "'.join(text_inputs) + '"]',
-        "durs=[" + ", ".join(map(str, dur_inputs)) + "]",
-    ]
 
-    result = subprocess.run(
-        command, cwd=os.path.join(os.getcwd(), "..", "teach_hm"), capture_output=True, text=True, check=False
-    )
-    print("Command result:", result)
-    return FileResponse(path, media_type="video/mp4", filename="result.mp4")
+# @app.get("/status")
+
+
+# @app.get("/download/{file_id}")

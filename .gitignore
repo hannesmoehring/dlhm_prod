@@ -1,0 +1,7 @@
+.vscode
+.python-version
+__pycache__/
+
+notes.md
+.DS_Store
+
