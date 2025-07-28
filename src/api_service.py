@@ -7,10 +7,12 @@ from dotenv import load_dotenv
 from fastapi import Body, FastAPI
 from fastapi.responses import FileResponse
 
+from model_handler import ModelHandler
 import dlhm_types
 
 app = FastAPI()
 load_dotenv("local.env")
+mh = ModelHandler()
 
 EXPERIMENT_PATH = os.getenv("EXPERIMENT_PATH")
 DEFAULT_OUTPUT_DIR = os.path.join(os.getcwd(), "output")
@@ -26,7 +28,9 @@ async def alive() -> str:
 # @app.post("/upload", respone_class)
 
 
-# @app.post("/generate")
+@app.post("/generate/")
+async def generate(motion_description: str, durations: list[float], model_id: str):
+    
 
 
 # @app.get("/status")

@@ -1,8 +1,10 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
 class MotionDescription(BaseModel):
-    data: list[tuple[str, float]]
+    text: str
+    durs: Optional[list[int]]
 
 
 class ModelInput(BaseModel):
