@@ -11,7 +11,7 @@ sudo wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x8
 sudo /bin/bash ~/miniconda.sh -b -p /opt/conda && \
 sudo rm -r ~/miniconda.sh
 sudo mount -o remount,size=8G /dev/shm
-sleep 3m
+sleep 10s
 echo "starting copy"
 rsync /mnt/projects/dlhm/mohringhannes/misc/local_conda.tar.gz .
 echo "starting unpack"
@@ -21,7 +21,7 @@ rm local_conda.tar.gz
 cd $CURRENT_DIR
 echo "starting conda env"
 source /opt/conda/bin/activate unpacked_conda/
-sleep 1m
+sleep 10s
 cd $CURRENT_DIR
 python -m pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
 python -m pip install numpy==1.21

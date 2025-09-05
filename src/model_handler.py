@@ -13,10 +13,11 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(current_dir, "output")
 
 TEACH_DIR = os.path.join(current_dir, "models", "teach", "teach")
-TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "venv", "bin", "python")
+TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "teach_venv", "bin", "python")
 
 T2M_DIR = os.path.join(current_dir, "models", "t2m", "T2M-GPT")
-T2M_PYTHON = os.path.join(T2M_DIR, "..", "venv", "bin", "python")
+# ../unpacked_conda/bin/python run_t2m.py "a person sprinting and jumping"
+T2M_PYTHON = os.path.join(T2M_DIR, "..", "unpacked_conda", "bin", "python")
 
 MODEL_STORAGE_DIR = os.path.join(current_dir, "model_store")
 stored_models: list[uuid.UUID] = []
@@ -66,6 +67,37 @@ class ModelHandler:
             print("\n[teach subprocess] finished successfully.")
         else:
             print(f"\n[teach subprocess] exited with code {exit_code}")
+
+    def t2m_handler(self, motion_desc: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
+        command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}"'
+
+        process = subprocess.Popen(
+            command_str,
+            cwd=T2M_DIR,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            shell=True,
+            bufsize=1,
+        )
+
+        print("[t2m subprocess] starting...\n")
+
+        try:
+            if process.stdout is not None:
+                for line in process.stdout:
+                    print(line, end="")
+            else:
+                print("[t2m subprocess] No stdout to read from.")
+        except KeyboardInterrupt:
+            print("\n[t2m subprocess] interrupted. Terminating.")
+            process.terminate()
+
+        exit_code = process.wait()
+        if exit_code == 0:
+            print("\n[t2m subprocess] finished successfully.")
+        else:
+            print(f"\n[t2m subprocess] exited with code {exit_code}")
 
     def store_model(self, model: UploadFile, model_id: uuid.UUID) -> bool:
         save_path = os.path.join(MODEL_STORAGE_DIR, "model_" + str(model_id))
