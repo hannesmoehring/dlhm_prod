@@ -15,6 +15,9 @@ OUTPUT_DIR = os.path.join(current_dir, "output")
 TEACH_DIR = os.path.join(current_dir, "models", "teach", "teach")
 TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "venv", "bin", "python")
 
+T2M_DIR = os.path.join(current_dir, "models", "t2m", "T2M-GPT")
+T2M_PYTHON = os.path.join(T2M_DIR, "..", "venv", "bin", "python")
+
 MODEL_STORAGE_DIR = os.path.join(current_dir, "model_store")
 stored_models: list[uuid.UUID] = []
 
