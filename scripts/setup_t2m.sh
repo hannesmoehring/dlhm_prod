@@ -25,7 +25,7 @@ cd $CURRENT_DIR
 python -m pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
 python -m pip install numpy==1.21
 python -m pip install moviepy==1.0.3
-printf "import ssl\nssl._create_default_https_context = ssl._create_unverified_context\n\n" | cat - $CURRENT_DIR/unpacked_conda/lib/python3.8/site-packages/clip/clip.py > temp && mv temp /home/mohringhannes/unpacked_conda/lib/python3.8/site-packages/clip/clip.py
+printf "import ssl\nssl._create_default_https_context = ssl._create_unverified_context\n\n" | cat - $CURRENT_DIR/unpacked_conda/lib/python3.8/site-packages/clip/clip.py > temp && mv temp $CURRENT_DIR/unpacked_conda/lib/python3.8/site-packages/clip/clip.py
 echo "getting everything."
 rsync --progress /mnt/projects/dlhm/mohringhannes/dev/t2m/gpt_t2m_20250809-051810.zip .
 unzip gpt_t2m_20250809-051810.zip
