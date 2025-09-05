@@ -20,10 +20,9 @@ stored_models: list[uuid.UUID] = []
 
 
 class ModelHandler:
-    async def generate(
-        self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = []
-    ):
+    async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = []):
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
+
         self.teach_handler(motion_desc=motion_desc, request_id=request_id, model_id=model_id, durations=durations)
 
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_FINISHED
@@ -34,16 +33,8 @@ class ModelHandler:
     def teach_handler(self, motion_desc: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
         script_name = "interact_teach.py"
         output_dir = f"{OUTPUT_DIR}/teach_{request_id}"
-        motion_input = [motion_desc, 5]
-        command_str = f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=experiment/teach/ output={output_dir} texts='[{motion_desc}]' durs='[5]'"
-        args = [
-            TEACH_PYTHON,
-            script_name,
-            "folder=experiment/teach/",
-            f"output={output_dir}",
-            "texts='[a running person]'",
-            "durs='[5]'",
-        ]
+        motion_duration = 5
+        command_str = f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=experiment/teach/ output={output_dir} texts='[{motion_desc}]' durs='[{motion_duration}]'"
 
         process = subprocess.Popen(
             command_str,
