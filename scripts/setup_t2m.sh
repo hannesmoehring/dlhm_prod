@@ -17,6 +17,7 @@ rsync /mnt/projects/dlhm/mohringhannes/misc/local_conda.tar.gz .
 echo "starting unpack"
 mkdir unpacked_conda
 tar -xzf local_conda.tar.gz -C unpacked_conda
+rm local_conda.tar.gz
 cd $CURRENT_DIR
 echo "starting conda env"
 source /opt/conda/bin/activate unpacked_conda/
@@ -29,11 +30,12 @@ printf "import ssl\nssl._create_default_https_context = ssl._create_unverified_c
 echo "getting everything."
 rsync --progress /mnt/projects/dlhm/mohringhannes/dev/t2m/gpt_t2m_20250809-051810.zip .
 unzip gpt_t2m_20250809-051810.zip
+rm gpt_t2m_20250809-051810.zip
 mkdir T2M-GPT/dataset
 cd T2M-GPT/dataset
-python -m gdown 1rmnG-R8wTb1sRs0PYp4RRmLg8XH-qSGW
-unzip humanml3d.zip
-mv humanml3d HumanML3D
+#python -m gdown 1rmnG-R8wTb1sRs0PYp4RRmLg8XH-qSGW
+#unzip humanml3d.zip
+#mv humanml3d HumanML3D
 cd $CURRENT_DIR
 cp /mnt/projects/dlhm/mohringhannes/dev/t2m/run_t2m.py T2M-GPT/
 python -m pip install h5py
@@ -45,6 +47,7 @@ mkdir body_models
 cd body_models
 rsync /mnt/projects/dlhm/mohringhannes/dev/t2m/smpl.zip .
 unzip smpl.zip
+rm smpl.zip
 cd ..
 echo "starting example run"
 sed -i '183c\    import glob, os\n    filename_list = [f for f in sorted(glob.glob(os.path.join(args.filedir, "*"))) if f.endswith((".npy",".npz"))]' render_final.py
