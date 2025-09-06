@@ -38,7 +38,7 @@ class ModelHandler:
         script_name = "interact_teach.py"
         output_dir = f"{OUTPUT_DIR}/teach_{request_id}"
         motion_duration = 5
-        command_str = f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=experiment/teach/ output={output_dir} texts='[{motion_desc}]' durs='[{motion_duration}]'"
+        command_str = f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='[{motion_desc}]' durs='[{motion_duration}]'"
 
         process = subprocess.Popen(
             command_str,
