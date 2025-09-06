@@ -29,7 +29,7 @@ os.makedirs(MODEL_STORAGE_DIR, exist_ok=True)
 class ModelHandler:
     async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = []):
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
-
+        # os.makedirs(OUTPUT_DIR + f"/{request_id}", exist_ok=True)
         self.teach_handler(motion_desc=motion_desc, request_id=request_id, model_id=model_id, durations=durations)
         self.t2m_handler(motion_desc=motion_desc, request_id=request_id, model_id=model_id)
 
