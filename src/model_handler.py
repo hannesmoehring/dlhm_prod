@@ -69,7 +69,8 @@ class ModelHandler:
             print(f"\n[teach subprocess] exited with code {exit_code}")
 
     def t2m_handler(self, motion_desc: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
-        command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}"'
+        output_dir = f"{OUTPUT_DIR}/t2m_{request_id}"
+        command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
 
         process = subprocess.Popen(
             command_str,

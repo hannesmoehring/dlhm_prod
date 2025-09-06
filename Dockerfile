@@ -4,7 +4,7 @@ LABEL maintainer="Hannes Moehring"
 WORKDIR /app
 
 RUN pip install --upgrade pip
-RUN pip install "pip<24.1"
+RUN pip install "pip==21.3"
 COPY . .
 
 
