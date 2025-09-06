@@ -2,6 +2,7 @@
 import os
 import sys
 
+
 clip_text = [sys.argv[1]] if len(sys.argv) > 1 else ["a person is confused"]
 OUTPUT_PATH: str = sys.argv[2] if len(sys.argv) > 2 else f"../gen_output/t2m_{clip_text[0][:10].replace(' ','_')}"
 
