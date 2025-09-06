@@ -12,10 +12,10 @@ import dlhm_types
 current_dir = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(current_dir, "output")
 
-TEACH_DIR = os.path.join(current_dir, "models", "teach", "teach")
+TEACH_DIR = os.path.join(current_dir, "..", "models", "teach", "teach")
 TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "teach_venv", "bin", "python")
 
-T2M_DIR = os.path.join(current_dir, "models", "t2m", "T2M-GPT")
+T2M_DIR = os.path.join(current_dir, "..", "models", "t2m", "T2M-GPT")
 # ../unpacked_conda/bin/python run_t2m.py "a person sprinting and jumping"
 T2M_PYTHON = os.path.join(T2M_DIR, "..", "unpacked_conda", "bin", "python")
 
