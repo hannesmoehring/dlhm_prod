@@ -29,18 +29,19 @@ os.makedirs(MODEL_STORAGE_DIR, exist_ok=True)
 class ModelHandler:
     async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = []):
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
-        # os.makedirs(OUTPUT_DIR + f"/{request_id}", exist_ok=True)
-        self.teach_handler(motion_desc=motion_desc, request_id=request_id, model_id=model_id, durations=durations)
-        self.t2m_handler(motion_desc=motion_desc, request_id=request_id, model_id=model_id)
+        req_output_dir = OUTPUT_DIR + f"/{request_id}"
+        os.makedirs(req_output_dir)
+        self.teach_handler(motion_desc=motion_desc, directory=req_output_dir, request_id=request_id, model_id=model_id, durations=durations)
+        self.t2m_handler(motion_desc=motion_desc, directory=req_output_dir, request_id=request_id, model_id=model_id)
 
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_FINISHED
 
         status_store[request_id] = dlhm_types.RequestStatus.SUCCESS
 
     # python interact_teach.py folder=experiment/teach/ output=../output/outputyyy/ texts='[run, wave, walk]' durs='[5, 5,5]'
-    def teach_handler(self, motion_desc: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
+    def teach_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
         script_name = "interact_teach.py"
-        output_dir = f"{OUTPUT_DIR}/teach_{request_id}"
+        output_dir = f"{directory}/teach_{request_id}"
         motion_duration = 5
         command_str = f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='[{motion_desc}]' durs='[{motion_duration}]'"
 
@@ -72,10 +73,10 @@ class ModelHandler:
         else:
             print(f"\n[teach subprocess] exited with code {exit_code}")
 
-    def t2m_handler(self, motion_desc: str, request_id: uuid.UUID, model_id=None):
-        output_dir = f"{OUTPUT_DIR}/t2m_{request_id}"
+    def t2m_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None):
+        output_dir = f"{directory}/t2m_{request_id}"
         command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
-
+        final_render_command = f"cd {T2M_DIR} && {T2M_PYTHON} render_final.py --filedir {output_dir}_smpl --motion-list 1"
         process = subprocess.Popen(
             command_str,
             cwd=T2M_DIR,
@@ -101,6 +102,35 @@ class ModelHandler:
         exit_code = process.wait()
         if exit_code == 0:
             print("\n[t2m subprocess] finished successfully.")
+        else:
+            print(f"\n[t2m subprocess] exited with code {exit_code}")
+
+        print("\n[t2m subprocess] starting final rendering for SMPL rendering...\n")
+        process = subprocess.Popen(
+            final_render_command,
+            cwd=T2M_DIR,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            shell=True,
+            bufsize=1,
+        )
+
+        print("[t2m subprocess] rendering...\n")
+
+        try:
+            if process.stdout is not None:
+                for line in process.stdout:
+                    print(line, end="")
+            else:
+                print("[t2m subprocess] No stdout to read from.")
+        except KeyboardInterrupt:
+            print("\n[t2m subprocess] interrupted. Terminating.")
+            process.terminate()
+
+        exit_code = process.wait()
+        if exit_code == 0:
+            print("\n[t2m subprocess] finished rendering.")
         else:
             print(f"\n[t2m subprocess] exited with code {exit_code}")
 
