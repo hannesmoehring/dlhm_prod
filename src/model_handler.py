@@ -28,6 +28,7 @@ class ModelHandler:
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
 
         self.teach_handler(motion_desc=motion_desc, request_id=request_id, model_id=model_id, durations=durations)
+        self.t2m_handler(motion_desc=motion_desc, request_id=request_id, model_id=model_id)
 
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_FINISHED
 
@@ -68,7 +69,7 @@ class ModelHandler:
         else:
             print(f"\n[teach subprocess] exited with code {exit_code}")
 
-    def t2m_handler(self, motion_desc: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
+    def t2m_handler(self, motion_desc: str, request_id: uuid.UUID, model_id=None):
         output_dir = f"{OUTPUT_DIR}/t2m_{request_id}"
         command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
 
