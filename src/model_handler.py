@@ -22,6 +22,9 @@ T2M_PYTHON = os.path.join(T2M_DIR, "..", "unpacked_conda", "bin", "python")
 MODEL_STORAGE_DIR = os.path.join(current_dir, "model_store")
 stored_models: list[uuid.UUID] = []
 
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(MODEL_STORAGE_DIR, exist_ok=True)
+
 
 class ModelHandler:
     async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = []):
