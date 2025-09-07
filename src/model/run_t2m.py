@@ -1,4 +1,7 @@
-# change the text here
+# this file is from the demo of T2M, it generates motion from text input
+# https://github.com/Mael-zys/T2M-GPT
+
+
 import os
 import sys
 

@@ -1,3 +1,10 @@
+# model_handler.py
+# This file handles the interaction with the models TEACH and T2M
+# It manages model storage, generation requests and output retrieval
+# It uses subprocess to call the respective model scripts
+# and manages the output files accordingly as well as makes them available for download
+
+
 import os
 import shutil
 import subprocess
@@ -12,6 +19,7 @@ import dlhm_types
 current_dir = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(current_dir, "output")
 
+# Paths for python interpreters/exeutables and model directories.
 TEACH_DIR = os.path.join(current_dir, "..", "models", "teach", "teach")
 TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "teach_venv", "bin", "python")
 TEACH_MODEL = os.path.join(TEACH_DIR, "", "data", "smpl_model", "smpl")
@@ -36,6 +44,7 @@ class ModelHandler:
         t2m_output_dir = req_output_dir + f"/t2m"
         os.makedirs(teach_output_dir, exist_ok=True)
         os.makedirs(t2m_output_dir, exist_ok=True)
+        # custom smpl model handling. replaces the new model with the existing one. Backup is created on service start.
         if model_id is not None:
             print(f"Using custom model {model_id}")
             os.remove(TEACH_MODEL + "SMPL_MALE.pkl")
@@ -54,7 +63,8 @@ class ModelHandler:
 
         status_store[request_id] = dlhm_types.RequestStatus.SUCCESS
 
-    # python interact_teach.py folder=experiment/teach/ output=../output/outputyyy/ texts='[run, wave, walk]' durs='[5, 5,5]'
+    # TEACH handler, calls the interact_teach.py script with subprocess
+    # and streams the output to the console
     def teach_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
         script_name = "interact_teach.py"
         output_dir = f"{directory}/teach_{request_id}"
@@ -89,6 +99,8 @@ class ModelHandler:
         else:
             print(f"\n[teach subprocess] exited with code {exit_code}")
 
+    # T2M handler, calls the run_t2m.py script with subprocess as well as a rendering script
+    # and streams the output to the console
     def t2m_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None):
         output_dir = f"{directory}/t2m_{request_id}"
         command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
@@ -151,6 +163,8 @@ class ModelHandler:
         else:
             print(f"\n[t2m subprocess] exited with code {exit_code}")
 
+    # store the uploaded model in the model storage directory
+    # and keep track of the stored models in memory
     def store_model(self, model: UploadFile, model_id: uuid.UUID) -> bool:
         os.makedirs(MODEL_STORAGE_DIR + f"/{model_id}", exist_ok=True)
         save_path = os.path.join(MODEL_STORAGE_DIR, f"{model_id}", "SMPL_MALE.pkl")
@@ -165,9 +179,11 @@ class ModelHandler:
         except:
             return False
 
+    # checks model storage if the required model is available
     def check_model_storage(self, model_id: uuid.UUID) -> bool:
         return model_id in stored_models
 
+    # retrieves the generated video file for a request_id
     def retrieve_video(self, request_id) -> FileResponse:
         selected_model = "teach"
         filename = f"{selected_model}_{request_id}.mp4"

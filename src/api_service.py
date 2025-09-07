@@ -1,6 +1,11 @@
+# This is the api_service that handles requests, responses and forwarding them to the model handler
+# It uses FastAPI for the web service
+# and dotenv for environment variable management
+# The model handler is in model_handler.py
+
+
 import asyncio
 import os
-import subprocess
 import uuid
 from typing import Optional
 import tempfile
@@ -25,11 +30,17 @@ if not os.path.exists(DEFAULT_OUTPUT_DIR):
 status_store: dict[uuid.UUID, dlhm_types.RequestStatus] = {}
 
 
+# Health check endpoint
 @app.get("/alive")
 async def alive() -> str:
     return "Service is living the dream and hopefully doing well"
 
 
+# Model Upload endpoint expects a smpl model in .pkl format
+# as also required by TEACH, TEMOS and other SMPL based models
+# Example:
+# curl -X POST "http://localhost:8000/upload_model/" \
+# -F "model=@SMPL_NEUTRAL.pkl"
 @app.post("/upload_model/", response_model=uuid.UUID)
 async def upload_model(model: UploadFile) -> uuid.UUID:
     model_id = uuid.uuid4()
@@ -39,6 +50,9 @@ async def upload_model(model: UploadFile) -> uuid.UUID:
     return model_id
 
 
+# Generation endpoint, starts the generation processs in the background
+# Example:
+# curl "http://localhost:8000/generate/?motion_description=some_description&model_id=some_model_id&durations[]=1.0&durations[]=2.0"
 @app.get("/generate/", response_model=uuid.UUID)
 async def generate(motion_description: str, model_id: Optional[str] = None, durations: Optional[list[float]] = Query(default=None)) -> uuid.UUID:
     request_id = uuid.uuid4()
@@ -59,6 +73,10 @@ async def generate(motion_description: str, model_id: Optional[str] = None, dura
     return request_id
 
 
+# Status endpoint, returns the status of a request
+# Example:
+# curl "http://localhost:8000/status/some_request_id"
+# Possible statuses are defined in dlhm_types.RequestStatus
 @app.get("/status/{request_id}", response_model=dlhm_types.RequestStatus)
 async def get_status(request_id: uuid.UUID) -> dlhm_types.RequestStatus:
     if request_id not in status_store:
@@ -66,6 +84,9 @@ async def get_status(request_id: uuid.UUID) -> dlhm_types.RequestStatus:
     return status_store[request_id]
 
 
+# Download endpoint, returns a zip file with the generated motion data
+# Example:
+# curl -O "http://localhost:8000/download/some_request_id"
 @app.get("/download/{request_id}", response_class=FileResponse)
 async def download(request_id: uuid.UUID):
     if request_id not in status_store:

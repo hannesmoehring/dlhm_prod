@@ -10,10 +10,10 @@ class MotionDescription(BaseModel):
 
 
 class ModelInput(BaseModel):
-    # TODO: Define for smpl inputs
     model: object
 
 
+# Possible statuses for a request
 class RequestStatus(Enum):
     FAILED = "Process failed."
 

@@ -3,6 +3,10 @@
 This project enables **motion generation** from textual descriptions using two models: **T2M** and **TEACH**.  
 Given a text input, the system generates a corresponding 3D motion and provides a downloadable archive with the results.
 
+## For CAMP PAI users
+
+In the directory `camp_configs`, there are scripts available for more advanced but automated usage of the models as well as the scripts used for training them. This only works as long as the required files exist in `projects/dlhm/mohringhannes`.
+
 ---
 
 ## 📂 Project Structure
@@ -33,7 +37,7 @@ Given a text input, the system generates a corresponding 3D motion and provides 
 ## ⚙️ Setup
 
 1. **Download & Unpack**  
-   First, download and unpack the provided project folder.
+   First, download and unpack the provided project folder. When unpacked, the project might be out of date and `git pull` has to be called.
 
 2. **Install Requirements**
 
@@ -135,6 +139,8 @@ src/output/<request_id>/
 - Provided environments are recommended due to fragile dependencies.
 - Server defaults to **port 8000**.
 
+---
+
 ## Caveats
 
 - Model Upload is supported for SMPL Models via the model_upload endpoint
@@ -143,6 +149,12 @@ src/output/<request_id>/
 `
   - But due to the complex structure of TEACH and other projects, this is fragile.
 - Unfortunately, there was no reliable way found to quantitavely measure the quality of single outputs.
+
+---
+
+## Expansion
+
+If there is a need to add other models, a handling method has to be created in model_handler, which can be copied from the other handlers for the most part. The new model also needs defined interpreters and a directory in model_handler. This makes it relatively easy to just add other models later on.
 
 ---
 
