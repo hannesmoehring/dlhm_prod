@@ -37,6 +37,7 @@ mv temp/dlhm_prod/models/t2m/T2M-GPT models/t2m/
 mv temp/dlhm_prod/models/teach/teach models/teach/
 mv temp/dlhm_prod/models/teach/baseline models/teach/baseline/
 
+cp models/t2m/T2M-GPT/body_models/smpl/SMPL_NEUTRAL.pkl models/t2m/T2M-GPT/body_models/smpl/SMPL_NEUTRAL_backup.pkl 
 
 echo "checking model paths"
 

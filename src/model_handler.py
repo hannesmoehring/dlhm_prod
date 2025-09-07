@@ -25,8 +25,8 @@ TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "teach_venv", "bin", "python")
 TEACH_MODEL = os.path.join(TEACH_DIR, "", "data", "smpl_model", "smpl")
 
 T2M_DIR = os.path.join(current_dir, "..", "models", "t2m", "T2M-GPT")
-# ../unpacked_conda/bin/python run_t2m.py "a person sprinting and jumping"
 T2M_PYTHON = os.path.join(T2M_DIR, "..", "unpacked_conda", "bin", "python")
+T2M_MODEL = os.path.join(T2M_DIR, "body_models", "smpl")
 
 MODEL_STORAGE_DIR = os.path.join(current_dir, "model_store")
 stored_models: list[uuid.UUID] = []
@@ -44,11 +44,14 @@ class ModelHandler:
         t2m_output_dir = req_output_dir + f"/t2m"
         os.makedirs(teach_output_dir, exist_ok=True)
         os.makedirs(t2m_output_dir, exist_ok=True)
+
         # custom smpl model handling. replaces the new model with the existing one. Backup is created on service start.
         if model_id is not None:
             print(f"Using custom model {model_id}")
             os.remove(TEACH_MODEL + "SMPL_MALE.pkl")
+            os.remove(T2M_MODEL + "SMPL_NEUTRAL.pkl")
             shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", TEACH_MODEL + "SMPL_MALE.pkl")
+            shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", T2M_MODEL + "SMPL_NEUTRAL.pkl")
 
         try:
             self.teach_handler(motion_desc=motion_desc, directory=teach_output_dir, request_id=request_id, model_id=model_id, durations=durations)

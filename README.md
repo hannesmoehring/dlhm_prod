@@ -3,11 +3,25 @@
 This project enables **motion generation** from textual descriptions using two models: **T2M** and **TEACH**.  
 Given a text input, the system generates a corresponding 3D motion and provides a downloadable archive with the results.
 
+This only works as long as the required files exist in `projects/dlhm/mohringhannes` for the DLHM Project.
+
 ## For CAMP PAI users
 
-In the directory `camp_configs`, there are scripts available for more advanced but automated usage of the models as well as the scripts used for training them. This only works as long as the required files exist in `projects/dlhm/mohringhannes`.
+In the directory `camp_configs`, there are scripts available for more advanced but automated usage of the models as well as the scripts used for training them.
 
 In order to integrate custom SMPL models here, replace that models existing in `dlhm_prod/models/t2m/T2M-GPT/smpl_body` and `teach/data/smpl_models/smpl`.
+
+### Quick Start CAMP
+
+To quickly use this project, one can simply use this command to start a job in PAI, or just use the commands on an existing machine.
+
+```
+git clone https://github.com/hannesmoehring/dlhm_prod.git
+cd dlhm_prod
+./setup.sh
+echo "FINISHED"
+sleep 4h # now SSH can be used to start (./start_api.sh in dlhm_prod) and use the API
+```
 
 ---
 
