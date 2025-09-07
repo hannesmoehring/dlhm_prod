@@ -7,7 +7,7 @@ RUN pip install --upgrade pip
 RUN pip install "pip==21.3"
 COPY . .
 
-
+# install uvicorn
 
 RUN pip install "torch==1.11.0 torchmetrics==0.7.2 torchvision==0.12.0 numpy==1.22.3"
 

@@ -31,8 +31,12 @@ class ModelHandler:
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
         req_output_dir = OUTPUT_DIR + f"/{request_id}"
         os.makedirs(req_output_dir)
-        self.teach_handler(motion_desc=motion_desc, directory=req_output_dir, request_id=request_id, model_id=model_id, durations=durations)
-        self.t2m_handler(motion_desc=motion_desc, directory=req_output_dir, request_id=request_id, model_id=model_id)
+        teach_output_dir = req_output_dir + f"/teach"
+        t2m_output_dir = req_output_dir + f"/t2m"
+        os.makedirs(teach_output_dir, exist_ok=True)
+        os.makedirs(t2m_output_dir, exist_ok=True)
+        self.teach_handler(motion_desc=motion_desc, directory=teach_output_dir, request_id=request_id, model_id=model_id, durations=durations)
+        self.t2m_handler(motion_desc=motion_desc, directory=t2m_output_dir, request_id=request_id, model_id=model_id)
 
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_FINISHED
 
@@ -106,6 +110,7 @@ class ModelHandler:
             print(f"\n[t2m subprocess] exited with code {exit_code}")
 
         print("\n[t2m subprocess] starting final rendering for SMPL rendering...\n")
+
         process = subprocess.Popen(
             final_render_command,
             cwd=T2M_DIR,
