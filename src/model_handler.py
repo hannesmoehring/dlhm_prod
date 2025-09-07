@@ -14,6 +14,7 @@ OUTPUT_DIR = os.path.join(current_dir, "output")
 
 TEACH_DIR = os.path.join(current_dir, "..", "models", "teach", "teach")
 TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "teach_venv", "bin", "python")
+TEACH_MODEL = os.path.join(TEACH_DIR, "", "data", "smpl_model", "smpl")
 
 T2M_DIR = os.path.join(current_dir, "..", "models", "t2m", "T2M-GPT")
 # ../unpacked_conda/bin/python run_t2m.py "a person sprinting and jumping"
@@ -35,7 +36,18 @@ class ModelHandler:
         t2m_output_dir = req_output_dir + f"/t2m"
         os.makedirs(teach_output_dir, exist_ok=True)
         os.makedirs(t2m_output_dir, exist_ok=True)
-        self.teach_handler(motion_desc=motion_desc, directory=teach_output_dir, request_id=request_id, model_id=model_id, durations=durations)
+        if model_id is not None:
+            print(f"Using custom model {model_id}")
+            os.remove(TEACH_MODEL + "SMPL_MALE.pkl")
+            shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", TEACH_MODEL + "SMPL_MALE.pkl")
+
+        try:
+            self.teach_handler(motion_desc=motion_desc, directory=teach_output_dir, request_id=request_id, model_id=model_id, durations=durations)
+        except Exception as e:
+            print("Error during teach generation, attempting default model...")
+            os.remove(TEACH_MODEL + "SMPL_MALE.pkl")
+            shutil.copyfile(TEACH_MODEL + "SMPL_MALE_backup.pkl", TEACH_MODEL + "SMPL_MALE.pkl")
+
         self.t2m_handler(motion_desc=motion_desc, directory=t2m_output_dir, request_id=request_id, model_id=model_id)
 
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_FINISHED
@@ -140,7 +152,8 @@ class ModelHandler:
             print(f"\n[t2m subprocess] exited with code {exit_code}")
 
     def store_model(self, model: UploadFile, model_id: uuid.UUID) -> bool:
-        save_path = os.path.join(MODEL_STORAGE_DIR, "model_" + str(model_id))
+        os.makedirs(MODEL_STORAGE_DIR + f"/{model_id}", exist_ok=True)
+        save_path = os.path.join(MODEL_STORAGE_DIR, f"{model_id}", "SMPL_MALE.pkl")
         if model is None:
             return False
 
