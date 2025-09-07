@@ -48,10 +48,10 @@ class ModelHandler:
         # custom smpl model handling. replaces the new model with the existing one. Backup is created on service start.
         if model_id is not None:
             print(f"Using custom model {model_id}")
-            os.remove(TEACH_MODEL + "SMPL_MALE.pkl")
-            os.remove(T2M_MODEL + "SMPL_NEUTRAL.pkl")
-            shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", TEACH_MODEL + "SMPL_MALE.pkl")
-            shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", T2M_MODEL + "SMPL_NEUTRAL.pkl")
+            os.remove(TEACH_MODEL + "/SMPL_MALE.pkl")
+            os.remove(T2M_MODEL + "/SMPL_NEUTRAL.pkl")
+            shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", TEACH_MODEL + "/SMPL_MALE.pkl")
+            shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", T2M_MODEL + "/SMPL_NEUTRAL.pkl")
 
         try:
             self.teach_handler(motion_desc=motion_desc, directory=teach_output_dir, request_id=request_id, model_id=model_id, durations=durations)
