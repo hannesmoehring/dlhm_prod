@@ -22,7 +22,7 @@ OUTPUT_DIR = os.path.join(current_dir, "output")
 # Paths for python interpreters/exeutables and model directories.
 TEACH_DIR = os.path.join(current_dir, "..", "models", "teach", "teach")
 TEACH_PYTHON = os.path.join(TEACH_DIR, "..", "teach_venv", "bin", "python")
-TEACH_MODEL = os.path.join(TEACH_DIR, "", "data", "smpl_model", "smpl")
+TEACH_MODEL = os.path.join(TEACH_DIR, "", "data", "smpl_models", "smpl")
 
 T2M_DIR = os.path.join(current_dir, "..", "models", "t2m", "T2M-GPT")
 T2M_PYTHON = os.path.join(T2M_DIR, "..", "unpacked_conda", "bin", "python")
