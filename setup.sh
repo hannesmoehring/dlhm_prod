@@ -10,8 +10,8 @@ echo "attempting to retrieve files..."
 mkdir temp
 cd temp
 rsync --progress /mnt/projects/dlhm/mohringhannes/final/dlhm_final.tar.gz .
-tar -xzf dlhm_prod.tar.gz
-rm dlhm_prod.tar.gz
+tar -xzf dlhm_final.tar.gz
+rm dlhm_final.tar.gz
 # install project with models
 # unpack
 
@@ -35,7 +35,7 @@ cd ../..
 
 mv temp/dlhm_prod/models/t2m/T2M-GPT models/t2m/
 mv temp/dlhm_prod/models/teach/teach models/teach/
-mv temp/dlhm_prod/models/teach/baseline models/baseline/
+mv temp/dlhm_prod/models/teach/baseline models/teach/baseline/
 
 
 echo "checking model paths"

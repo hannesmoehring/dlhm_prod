@@ -7,6 +7,8 @@ Given a text input, the system generates a corresponding 3D motion and provides 
 
 In the directory `camp_configs`, there are scripts available for more advanced but automated usage of the models as well as the scripts used for training them. This only works as long as the required files exist in `projects/dlhm/mohringhannes`.
 
+In order to integrate custom SMPL models here, replace that models existing in `dlhm_prod/models/t2m/T2M-GPT/smpl_body` and `teach/data/smpl_models/smpl`.
+
 ---
 
 ## 📂 Project Structure
