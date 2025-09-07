@@ -3,7 +3,8 @@ import os
 import subprocess
 import uuid
 from typing import Optional
-
+import tempfile
+import shutil
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, Body, FastAPI, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
@@ -39,9 +40,7 @@ async def upload_model(model: UploadFile) -> uuid.UUID:
 
 
 @app.get("/generate/", response_model=uuid.UUID)
-async def generate(
-    motion_description: str, model_id: Optional[str] = None, durations: Optional[list[float]] = Query(default=None)
-) -> uuid.UUID:
+async def generate(motion_description: str, model_id: Optional[str] = None, durations: Optional[list[float]] = Query(default=None)) -> uuid.UUID:
     request_id = uuid.uuid4()
     status_store[request_id] = dlhm_types.RequestStatus.REQUEST_RECEIVED
     if (model_id is not None) and (not mh.check_model_storage(model_id=uuid.UUID(model_id))):
@@ -68,7 +67,7 @@ async def get_status(request_id: uuid.UUID) -> dlhm_types.RequestStatus:
 
 
 @app.get("/download/{request_id}", response_class=FileResponse)
-async def download(request_id: uuid.UUID) -> FileResponse:
+async def download(request_id: uuid.UUID):
     if request_id not in status_store:
         raise HTTPException(status_code=404, detail="Request not found")
 
@@ -76,4 +75,14 @@ async def download(request_id: uuid.UUID) -> FileResponse:
     if status != dlhm_types.RequestStatus.SUCCESS:
         raise HTTPException(status_code=425, detail="Request is not ready yet")
 
-    return mh.retrieve_video(request_id=request_id)
+    folder_path = os.path.join(DEFAULT_OUTPUT_DIR, str(request_id))
+
+    # Make a temp zip
+    tmp_zip = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
+    shutil.make_archive(tmp_zip.name.replace(".zip", ""), "zip", folder_path)
+
+    return FileResponse(
+        path=tmp_zip.name,
+        filename=f"{request_id}.zip",
+        media_type="application/zip",
+    )
