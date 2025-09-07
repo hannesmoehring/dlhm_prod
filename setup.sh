@@ -9,7 +9,7 @@ sudo apt install uvicorn
 echo "attempting to retrieve files..."
 mkdir temp
 cd temp
-rsync --progress /mnt/projects/dlhm/mohringhannes/misc/dlhm_prod.tar.gz .
+rsync --progress /mnt/projects/dlhm/mohringhannes/final/dlhm_final.tar.gz .
 tar -xzf dlhm_prod.tar.gz
 rm dlhm_prod.tar.gz
 # install project with models
