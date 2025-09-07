@@ -1,0 +1,72 @@
+protocolVersion: 2
+name: hm_teach_train_f785d74e
+type: job
+jobRetryCount: 0
+prerequisites:
+  - type: dockerimage
+    uri: >-
+      master.garching.cluster.campar.in.tum.de:10443/camp/ubuntu_22.04-python_3.10-cuda_11.7-pytorch_1.13-gpu:latest
+    name: docker_image_0
+taskRoles:
+  taskrole:
+    instances: 1
+    completion:
+      minFailedInstances: 1
+    taskRetryCount: 0
+    dockerImage: docker_image_0
+    resourcePerInstance:
+      gpu: 1
+      cpu: 4
+      memoryMB: 30000
+    nodeSelectionPerInstance:
+      - key: nvidia.com/gpu.memory
+        operator: Gt
+        values:
+          - '10000'
+      - key: nvidia.com/gpu.compute.major
+        operator: Gt
+        values:
+          - '0'
+    commands:
+      - >-
+        rsync --progress
+        /mnt/projects/dlhm/mohringhannes/dev/teach/teach_gpu_ready.tar.gz .
+      - tar -xzf teach_gpu_ready.tar.gz
+      - source teach_venv/bin/activate
+      - cd teach
+      - >-
+        python train.py experiment=baseline logger=none trainer.benchmark=true
+        trainer.check_val_every_n_epoch=50
+      - cd
+      - mkdir compress
+      - mv teach compress
+      - mv teach_venv compress
+      - >-
+        tar -cf teach_finished_full_epoch.tar.gz -C
+        /home/mohringhannes/compress/teach/teach/babel-amass .
+      - >-
+        rsync --progress teach_finished_full_epoch.tar.gz
+        /mnt/projects/dlhm/mohringhannes/dev/teach
+defaults:
+  virtualCluster: default
+extras:
+  com.microsoft.pai.runtimeplugin:
+    - plugin: ssh
+      parameters:
+        jobssh: true
+        userssh:
+          type: custom
+          value: ''
+    - plugin: teamwise_storage
+      parameters:
+        storageConfigNames:
+          - ceph-datasets
+          - ceph-home
+          - ceph-projects
+          - ceph-scratch
+  jobStatusChangeNotification:
+    running: false
+    succeeded: false
+    stopped: false
+    failed: true
+    retried: false

@@ -81,12 +81,11 @@ async def download(request_id: uuid.UUID):
     tmp_zip = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
     base_name = tmp_zip.name.replace(".zip", "")
 
-    # This zips the folder itself, not just its contents
     shutil.make_archive(
         base_name=base_name,
         format="zip",
-        root_dir=os.path.dirname(folder_path),  # parent directory
-        base_dir=os.path.basename(folder_path),  # folder itself
+        root_dir=os.path.dirname(folder_path),
+        base_dir=os.path.basename(folder_path),
     )
 
     return FileResponse(

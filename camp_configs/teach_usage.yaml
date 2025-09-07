@@ -1,0 +1,96 @@
+protocolVersion: 2
+name: hm_teach_USE_f593a46e
+type: job
+jobRetryCount: 0
+prerequisites:
+  - type: dockerimage
+    uri: >-
+      master.garching.cluster.campar.in.tum.de:10443/camp/ubuntu_22.04-python_3.10-cuda_11.7-pytorch_1.13-gpu:latest
+    name: docker_image_0
+taskRoles:
+  taskrole:
+    instances: 1
+    completion:
+      minFailedInstances: 1
+    taskRetryCount: 0
+    dockerImage: docker_image_0
+    resourcePerInstance:
+      gpu: 1
+      cpu: 4
+      memoryMB: 30000
+    nodeSelectionPerInstance:
+      - key: nvidia.com/gpu.memory
+        operator: Gt
+        values:
+          - "0"
+      - key: nvidia.com/gpu.compute.major
+        operator: Gt
+        values:
+          - "0"
+    commands:
+      - >-
+        rsync --progress
+        /mnt/projects/dlhm/mohringhannes/dev/teach/teach_gpu_ready.tar.gz .
+      - >-
+        rsync --progress
+        /mnt/projects/dlhm/mohringhannes/dev/teach/teach_finished_full_epoch.tar.gz
+        .
+      - echo "unpacking gpu ready"
+      - tar -xzf teach_gpu_ready.tar.gz
+      - echo "unpacking trained"
+      - tar -xf teach_finished_full_epoch.tar.gz
+      - cd
+      - source teach_venv/bin/activate
+      - mkdir compress_output
+      - echo "starting generation..."
+      - cd teach
+      - >-
+        python interact_teach.py folder=../baseline/17l8a1tq
+        output=../compress_output/v1-seed-1234 texts='[run, turn, hands over the
+        head, walk]' durs='[2, 1, 2, 1]' seed=1234
+      - >-
+        python interact_teach.py folder=../baseline/17l8a1tq 
+        output=../compress_output/v1-seed-4321 texts='[run, turn, hands over the
+        head, walk]' durs='[2, 1, 2, 1]' seed=4321
+      - >-
+        python interact_teach.py folder=../baseline/17l8a1tq 
+        output=../compress_output/v1-seed-0904 texts='[run, turn, hands over the
+        head, walk]' durs='[2, 1, 2, 1]' seed=0904
+      - >-
+        python interact_teach.py folder=../baseline/17l8a1tq
+        output=../compress_output/v2 texts='[run, jump and kick, sit down on the
+        ground]' durs='[2, 2, 2]' seed=1234
+      - >-
+        python interact_teach.py folder=../baseline/17l8a1tq
+        output=../compress_output/v3 texts='[jump in the air, dance, look around
+        and wave hands]' durs='[1, 4, 3]' seed=1234
+      - cd
+      - 'echo "generation finished, compressing and rsync..."'
+      - ls compress_output
+      - zip -r compress_output.zip compress_output
+      - >-
+        rsync --progress compress_output.zip
+        /mnt/projects/dlhm/mohringhannes/dev/teach/output
+defaults:
+  virtualCluster: default
+extras:
+  com.microsoft.pai.runtimeplugin:
+    - plugin: ssh
+      parameters:
+        jobssh: true
+        userssh:
+          type: custom
+          value: ""
+    - plugin: teamwise_storage
+      parameters:
+        storageConfigNames:
+          - ceph-datasets
+          - ceph-home
+          - ceph-projects
+          - ceph-scratch
+  jobStatusChangeNotification:
+    running: false
+    succeeded: false
+    stopped: false
+    failed: true
+    retried: false

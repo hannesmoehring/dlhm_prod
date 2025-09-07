@@ -1,0 +1,150 @@
+protocolVersion: 2
+name: t2m_hm_training_hml3d_f717df45
+type: job
+jobRetryCount: 0
+prerequisites:
+  - type: dockerimage
+    uri: >-
+      master.garching.cluster.campar.in.tum.de:10443/camp/ubuntu_20.04-python_3.8-cuda_11.3-pytorch_1.11-gpu:latest
+    name: docker_image_0
+taskRoles:
+  taskrole:
+    instances: 1
+    completion:
+      minFailedInstances: 1
+    taskRetryCount: 0
+    dockerImage: docker_image_0
+    resourcePerInstance:
+      gpu: 1
+      cpu: 4
+      memoryMB: 30000
+    nodeSelectionPerInstance:
+      - key: nvidia.com/gpu.memory
+        operator: Gt
+        values:
+          - '16000'
+      - key: nvidia.com/gpu.compute.major
+        operator: Gt
+        values:
+          - '0'
+    commands:
+      - nvidia-smi
+      - echo "sudo installs + wait"
+      - sudo apt install -y wget && \
+      - >-
+        sudo wget --quiet
+        https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O
+        ~/miniconda.sh && \
+      - sudo /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+      - sudo rm -r ~/miniconda.sh
+      - 'sudo mount -o remount,size=8G /dev/shm'
+      - sleep 3m
+      - echo "starting copy"
+      - rsync /mnt/projects/dlhm/mohringhannes/misc/local_conda.tar.gz .
+      - rsync /mnt/projects/dlhm/mohringhannes/dev/t2m/T2M-GPT.tar.gz .
+      - echo "starting unpack"
+      - tar -xzf T2M-GPT.tar.gz
+      - mkdir unpacked_conda
+      - tar -xzf local_conda.tar.gz -C unpacked_conda
+      - echo "starting data"
+      - rm -r T2M-GPT/dataset/KIT-ML
+      - cd
+      - echo "starting conda env"
+      - source /opt/conda/bin/activate unpacked_conda/
+      - cd T2M-GPT/dataset
+      - python -m gdown 1rmnG-R8wTb1sRs0PYp4RRmLg8XH-qSGW
+      - unzip humanml3d.zip
+      - mv humanml3d HumanML3D
+      - sleep 1m
+      - cd
+      - >-
+        python -m pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113
+        torchaudio==0.11.0 --extra-index-url
+        https://download.pytorch.org/whl/cu113
+      - python -m pip install numpy==1.21
+      - python -m pip install moviepy==1.0.3
+      - echo "starting VAE Training"
+      - cd T2M-GPT
+      - python train_vq.py \
+      - '--batch-size 256 \'
+      - '--lr 2e-4 \'
+      - '--total-iter 300000 \'
+      - '--lr-scheduler 200000 \'
+      - '--nb-code 512 \'
+      - '--down-t 2 \'
+      - '--depth 3 \'
+      - '--dilation-growth-rate 3 \'
+      - '--out-dir output \'
+      - '--dataname t2m \'
+      - '--vq-act relu \'
+      - '--quantizer ema_reset \'
+      - '--loss-vel 0.5 \'
+      - '--recons-loss l1_smooth \'
+      - '--exp-name VQVAE'
+      - cd
+      - 'echo "finished vq train, zipping"'
+      - mv T2M-GPT/dataset .
+      - zip -r "vae_t2m_$(date +%Y%m%d-%H%M%S).zip" T2M-GPT/
+      - rsync vae_t2m_*.zip /mnt/projects/dlhm/mohringhannes/dev/t2m
+      - mv dataset T2M-GPT/
+      - sleep 1m
+      - echo "finished save and starting gpt train"
+      - >-
+        printf "import ssl\nssl._create_default_https_context =
+        ssl._create_unverified_context\n\n" | cat -
+        /home/mohringhannes/unpacked_conda/lib/python3.8/site-packages/clip/clip.py
+        > temp && mv temp
+        /home/mohringhannes/unpacked_conda/lib/python3.8/site-packages/clip/clip.py
+      - cd T2M-GPT
+      - python train_t2m_trans.py  \
+      - '--exp-name GPT \'
+      - '--batch-size 128 \'
+      - '--num-layers 9 \'
+      - '--embed-dim-gpt 1024 \'
+      - '--nb-code 512 \'
+      - '--n-head-gpt 16 \'
+      - '--block-size 51 \'
+      - '--ff-rate 4 \'
+      - '--drop-out-rate 0.1 \'
+      - '--resume-pth output/VQVAE/net_last.pth \'
+      - '--vq-name VQVAE \'
+      - '--out-dir output \'
+      - '--total-iter 300000 \'
+      - '--lr-scheduler 150000 \'
+      - '--lr 0.0001 \'
+      - '--dataname t2m \'
+      - '--down-t 2 \'
+      - '--depth 3 \'
+      - '--quantizer ema_reset \'
+      - '--eval-iter 10000 \'
+      - '--pkeep 0.5 \'
+      - '--dilation-growth-rate 3 \'
+      - '--vq-act relu'
+      - cd
+      - 'echo "finished training gpt on humanml3d, zipping..."'
+      - mv T2M-GPT/dataset .
+      - zip -r "gpt_t2m_$(date +%Y%m%d-%H%M%S).zip" T2M-GPT/
+      - rsync gpt_t2m_*.zip /mnt/projects/dlhm/mohringhannes/dev/t2m
+defaults:
+  virtualCluster: default
+extras:
+  com.microsoft.pai.runtimeplugin:
+    - plugin: ssh
+      parameters:
+        jobssh: true
+        userssh:
+          type: custom
+          value: ''
+    - plugin: teamwise_storage
+      parameters:
+        storageConfigNames:
+          - ceph-datasets
+          - ceph-home
+          - ceph-projects
+          - ceph-scratch
+  jobStatusChangeNotification:
+    running: false
+    succeeded: false
+    stopped: false
+    failed: true
+    retried: false

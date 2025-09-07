@@ -5,4 +5,5 @@ __pycache__/
 notes.md
 .DS_Store
 
-models
+models/teach
+models/t2m
