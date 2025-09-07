@@ -92,7 +92,7 @@ class ModelHandler:
     def t2m_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None):
         output_dir = f"{directory}/t2m_{request_id}"
         command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
-        final_render_command = f"cd {T2M_DIR} && {T2M_PYTHON} render_final.py --filedir {output_dir}_smpl --motion-list 1"
+        final_render_command = f"cd {T2M_DIR} && {T2M_PYTHON} render_final.py --filedir {directory} --motion-list 1"
         process = subprocess.Popen(
             command_str,
             cwd=T2M_DIR,
