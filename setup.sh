@@ -4,7 +4,7 @@ echo "starting setup"
 python -m pip install --upgrade "pip==21.3"
 python -m pip install -r requirements.txt
 python -m pip install gdown
-sudo apt install uvicorn
+sudo apt install -y uvicorn
 
 echo "attempting to retrieve files..."
 mkdir temp
