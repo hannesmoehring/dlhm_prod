@@ -83,11 +83,11 @@ class ModelHandler:
         print(motion_desc)
         motion_info = f"[{motion_desc}]"
         print(motion_info)
-        if len(durations) != len(motion_info):
+        if len(durations) != (motion_info.count(",") + 1):
             print(
                 f"[teach subprocess] Warning: Number of durations {len(durations)} does not match number of motion segments {len(motion_info)}. Using default duration {motion_duration}s for all segments."
             )
-            durations = [motion_duration] * len(motion_info)
+            durations = [motion_duration] * (motion_info.count(",") + 1)
 
         print(f"[teach subprocess] using motion description: {motion_info}")
         print(f"[teach subprocess] using duration: {durations}")
