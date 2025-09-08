@@ -37,6 +37,9 @@ os.makedirs(MODEL_STORAGE_DIR, exist_ok=True)
 
 class ModelHandler:
     async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = [5]):
+        if durations == []:
+            durations = [5]
+
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
         req_output_dir = OUTPUT_DIR + f"/{request_id}"
         os.makedirs(req_output_dir)
@@ -71,7 +74,7 @@ class ModelHandler:
     def teach_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None, durations: list[float] = [5]):
         script_name = "interact_teach.py"
         output_dir = f"{directory}/teach_{request_id}"
-        motion_duration = 5
+        motion_duration = 2  # default duration per motion segment
         print(f"[teach subprocess] using motion description: {motion_desc}")
         print(f"[teach subprocess] using duration: {durations}")
         if ";" in motion_desc:
@@ -83,7 +86,7 @@ class ModelHandler:
             print(
                 f"[teach subprocess] Warning: Number of durations {len(durations)} does not match number of motion segments {len(motion_info)}. Using default duration {motion_duration}s for all segments."
             )
-            durations = [5] * len(motion_info)
+            durations = [motion_duration] * len(motion_info)
 
         command_str = (
             f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='{motion_info}' durs='{durations}'"
