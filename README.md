@@ -182,6 +182,7 @@ Using the prompt used as an example in the generate section, this is generated.
 - Provided environments are recommended due to fragile dependencies.
 - Server defaults to **port 8000**.
 - The projects for TEACH and T2M-GPT have to be included here, as some of their code had to be adjusted for this API Service to function properly.
+- Concurrency is made difficult because of GPU use and data stored in not shared memory. If it is still wished, simply change the number of workers in `start_api.sh`by inserting `uvicorn api_service:app --workers 4`
 
 ---
 
