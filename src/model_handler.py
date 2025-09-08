@@ -80,7 +80,7 @@ class ModelHandler:
         # if "," in motion_desc:
         #     motion_info = motion_desc.split(",")
         # else:
-        motion_info = [motion_desc]
+        motion_info = "[{motion_desc}]"
 
         if len(durations) != len(motion_info):
             print(
@@ -92,7 +92,7 @@ class ModelHandler:
         print(f"[teach subprocess] using duration: {durations}")
 
         command_str = (
-            f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='{motion_info}' durs='{durations}'"
+            f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts={motion_info} durs='{durations}'"
         )
 
         process = subprocess.Popen(
