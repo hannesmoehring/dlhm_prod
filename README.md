@@ -99,13 +99,13 @@ http://127.0.0.1:8000
 
 ### 1. Generate a Motion
 
-Send a description to the API. If multi-scene generation from TEACH should be used, the single scenes have to be seperated by `";"` in the description and a list of `durations` e.g. [2,3,4,...] should be passed. The optional parameter `model_id` is in case there is a custom smpl model.
+Send a description to the API. If multi-scene generation from TEACH should be used, the single scenes have to be seperated by `","` in the description and a list of `durations` e.g. 2,3,4,... should be passed. Due to curl not being able to URL encode, when requesting a generation via the command line, `_` is the placeholder for a space `' '` The optional parameter `model_id` is in case there is a custom smpl model.
 
 ```bash
 curl "http://127.0.0.1:8000/generate/?motion_description=<DESCRIPTION>"
 ```
 
-a complete example could be:
+a complete example could be (results for this request are at the end of this section):
 
 ```bash
 curl "http://127.0.0.1:8000/generate/?motion_description=walking_and_jumping,turning&durs=4,2"
