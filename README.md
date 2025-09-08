@@ -112,7 +112,7 @@ curl "http://127.0.0.1:8000/generate/?motion_description=walking_and_jumping,tur
 ```
 
 ```bash
-curl "curl "http://127.0.0.1:8000/generate/?motion_description=walking_and_jumping,turning&model_id=<model_id>&durs=4,2"
+curl "http://127.0.0.1:8000/generate/?motion_description=walking_and_jumping,turning&model_id=<model_id>&durs=4,2"
 ```
 
 ➡️ Returns a `request_id`.
