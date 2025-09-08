@@ -75,8 +75,7 @@ class ModelHandler:
         script_name = "interact_teach.py"
         output_dir = f"{directory}/teach_{request_id}"
         motion_duration = 2  # default duration per motion segment
-        print(f"[teach subprocess] using motion description: {motion_desc}")
-        print(f"[teach subprocess] using duration: {durations}")
+
         motion_desc = motion_desc.replace("_", " ")
         if "," in motion_desc:
             motion_info = motion_desc.split(",")
@@ -88,6 +87,9 @@ class ModelHandler:
                 f"[teach subprocess] Warning: Number of durations {len(durations)} does not match number of motion segments {len(motion_info)}. Using default duration {motion_duration}s for all segments."
             )
             durations = [motion_duration] * len(motion_info)
+
+        print(f"[teach subprocess] using motion description: {motion_info}")
+        print(f"[teach subprocess] using duration: {durations}")
 
         command_str = (
             f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='{motion_info}' durs='{durations}'"
