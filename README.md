@@ -1,3 +1,5 @@
+## 📄 [REPORT](./report.pdf)
+
 # Motion Generation from Textual Descriptions
 
 This project enables **motion generation** from textual descriptions using two models: **T2M** and **TEACH**.  
