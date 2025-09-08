@@ -80,8 +80,9 @@ class ModelHandler:
         # if "," in motion_desc:
         #     motion_info = motion_desc.split(",")
         # else:
+        print(motion_desc)
         motion_info = f"[{motion_desc}]"
-
+        print(motion_info)
         if len(durations) != len(motion_info):
             print(
                 f"[teach subprocess] Warning: Number of durations {len(durations)} does not match number of motion segments {len(motion_info)}. Using default duration {motion_duration}s for all segments."
@@ -92,7 +93,7 @@ class ModelHandler:
         print(f"[teach subprocess] using duration: {durations}")
 
         command_str = (
-            f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts={motion_info} durs='{durations}'"
+            f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='{motion_info}' durs='{durations}'"
         )
 
         process = subprocess.Popen(
