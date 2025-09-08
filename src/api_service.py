@@ -59,6 +59,7 @@ async def generate(motion_description: str, model_id: Optional[str] = None, durs
     status_store[request_id] = dlhm_types.RequestStatus.REQUEST_RECEIVED
     if (model_id is not None) and (not mh.check_model_storage(model_id=uuid.UUID(model_id))):
         raise HTTPException(status_code=400, detail="Bad model_id")
+    print(f"recieved prompt and durations: {motion_description}, {durs}")
     if durs is not None:
         durations = [float(x) for x in durs.split(",")]
     else:
