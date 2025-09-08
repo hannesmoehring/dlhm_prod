@@ -105,10 +105,14 @@ Send a description to the API. If multi-scene generation from TEACH should be us
 curl "http://127.0.0.1:8000/generate/?motion_description=<DESCRIPTION>"
 ```
 
-a complete example would be:
+a complete example could be:
 
 ```bash
-curl "http://127.0.0.1:8000/generate/?motion_description=walking;jumping;turning around&model_id=7c6...f85&durations=[4,3,2]
+curl "http://127.0.0.1:8000/generate/?motion_description=walking_and_jumping,turning&durs=4,2"
+```
+
+```bash
+curl "curl "http://127.0.0.1:8000/generate/?motion_description=walking_and_jumping,turning&model_id=<model_id>&durs=4,2"
 ```
 
 ➡️ Returns a `request_id`.
@@ -155,6 +159,21 @@ src/output/<request_id>/
 `-- teach
 ```
 
+### Examples
+
+Using the prompt used as an example in the generate section, this is generated.
+
+<p align="center">
+  <figure style="display:inline-block; text-align:center; margin:10px;">
+    <figcaption>T2M-GPT</figcaption>
+    <img src="assets/media/t2m_example.gif" width="400">
+  </figure>
+  <figure style="display:inline-block; text-align:center; margin:10px;">
+    <figcaption>TEACH</figcaption>
+    <img src="assets/media/teach_example.gif" width="400">
+  </figure>
+</p>
+
 ---
 
 ## ⚠️ Notes
@@ -162,6 +181,7 @@ src/output/<request_id>/
 - Ensure you have **Python 3.9** and **pip 21.3** for the environments.
 - Provided environments are recommended due to fragile dependencies.
 - Server defaults to **port 8000**.
+- The projects for TEACH and T2M-GPT have to be included here, as some of their code had to be adjusted for this API Service to function properly.
 
 ---
 

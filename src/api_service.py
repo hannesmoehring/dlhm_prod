@@ -52,7 +52,7 @@ async def upload_model(model: UploadFile) -> uuid.UUID:
 
 # Generation endpoint, starts the generation processs in the background
 # Example:
-# curl "http://localhost:8000/generate/?motion_description=some_description&model_id=some_model_id&durations[]=1.0&durations[]=2.0"
+# curl "http://127.0.0.1:8000/generate/?motion_description=walking_and_jumping,turning&durs=4,2"
 @app.get("/generate/", response_model=uuid.UUID)
 async def generate(motion_description: str, model_id: Optional[str] = None, durs: Optional[str] = Query(None)) -> uuid.UUID:
     request_id = uuid.uuid4()
