@@ -105,6 +105,12 @@ Send a description to the API. If multi-scene generation from TEACH should be us
 curl "http://127.0.0.1:8000/generate/?motion_description=<DESCRIPTION>"
 ```
 
+a complete example would be:
+
+```bash
+curl "http://127.0.0.1:8000/generate/?motion_description=walking;jumping;turning around&model_id=7c6...f85&durations=[4,3,2]
+```
+
 ➡️ Returns a `request_id`.
 
 ![Step 1](assets/media/step1.png)
