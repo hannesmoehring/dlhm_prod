@@ -39,7 +39,7 @@ class ModelHandler:
     async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = [5]):
         if durations == []:
             durations = [5]
-
+        motion_desc = motion_desc.replace("_", " ")
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
         req_output_dir = OUTPUT_DIR + f"/{request_id}"
         os.makedirs(req_output_dir)
@@ -76,7 +76,7 @@ class ModelHandler:
         output_dir = f"{directory}/teach_{request_id}"
         motion_duration = 2  # default duration per motion segment
 
-        motion_desc = motion_desc.replace("_", " ")
+        # motion_desc = motion_desc.replace("_", " ")
         # if "," in motion_desc:
         #     motion_info = motion_desc.split(",")
         # else:
