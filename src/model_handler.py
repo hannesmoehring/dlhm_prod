@@ -80,7 +80,7 @@ class ModelHandler:
         # if "," in motion_desc:
         #     motion_info = motion_desc.split(",")
         # else:
-        motion_info = "[{motion_desc}]"
+        motion_info = f"[{motion_desc}]"
 
         if len(durations) != len(motion_info):
             print(
