@@ -54,6 +54,10 @@ sleep 4h # now SSH can be used to start (./start_api.sh in dlhm_prod) and use th
 
 ## ⚙️ Setup
 
+### Quick Setup
+
+Using `./setup.sh` sets up the entire project if on the CAMP cluster. If the files are not in the in `setup.sh` defined places, those links have to be adjusted for it to setup the entire thing.
+
 1. **Download & Unpack**  
    First, download and unpack the provided project folder. When unpacked, the project might be out of date and `git pull` has to be called.
 
