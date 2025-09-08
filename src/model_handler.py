@@ -56,14 +56,22 @@ class ModelHandler:
             shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", TEACH_MODEL + "/SMPL_MALE.pkl")
             shutil.copyfile(MODEL_STORAGE_DIR + f"/{model_id}/SMPL_MALE.pkl", T2M_MODEL + "/SMPL_NEUTRAL.pkl")
 
+        # fallbacks if something goes wrong with a custom model
         try:
-            self.teach_handler(motion_desc=motion_desc, directory=teach_output_dir, request_id=request_id, model_id=model_id, durations=durations)
+            self.teach_handler(motion_desc=motion_desc, directory=teach_output_dir, request_id=request_id, durations=durations)
         except Exception as e:
             print("Error during teach generation, attempting default model...")
-            os.remove(TEACH_MODEL + "SMPL_MALE.pkl")
-            shutil.copyfile(TEACH_MODEL + "SMPL_MALE_backup.pkl", TEACH_MODEL + "SMPL_MALE.pkl")
+            if model_id is not None:
+                os.remove(TEACH_MODEL + "SMPL_MALE.pkl")
+                shutil.copyfile(TEACH_MODEL + "SMPL_MALE_backup.pkl", TEACH_MODEL + "SMPL_MALE.pkl")
 
-        self.t2m_handler(motion_desc=motion_desc, directory=t2m_output_dir, request_id=request_id, model_id=model_id)
+        try:
+            self.t2m_handler(motion_desc=motion_desc, directory=t2m_output_dir, request_id=request_id)
+        except Exception as e:
+            print("Error during t2m generation, attempting default model...")
+            if model_id is not None:
+                os.remove(T2M_MODEL + "SMPL_NEUTRAL.pkl")
+                shutil.copyfile(T2M_MODEL + "SMPL_NEUTRAL_backup.pkl", T2M_MODEL + "SMPL_NEUTRAL.pkl")
 
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_FINISHED
 
@@ -71,18 +79,16 @@ class ModelHandler:
 
     # TEACH handler, calls the interact_teach.py script with subprocess
     # and streams the output to the console
-    def teach_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None, durations: list[float] = [5]):
+    def teach_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, durations: list[float] = [5]):
         script_name = "interact_teach.py"
         output_dir = f"{directory}/teach_{request_id}"
         motion_duration = 2  # default duration per motion segment
 
-        # motion_desc = motion_desc.replace("_", " ")
-        # if "," in motion_desc:
-        #     motion_info = motion_desc.split(",")
-        # else:
-        print(motion_desc)
+        # print(motion_desc)
         motion_info = f"[{motion_desc}]"
-        print(motion_info)
+        # print(motion_info)
+
+        # check if durations match the number of motion assignments
         if len(durations) != (motion_info.count(",") + 1):
             print(
                 f"[teach subprocess] Warning: Number of durations {len(durations)} does not match number of motion segments {len(motion_info)}. Using default duration {motion_duration}s for all segments."
@@ -126,9 +132,9 @@ class ModelHandler:
 
     # T2M handler, calls the run_t2m.py script with subprocess as well as a rendering script
     # and streams the output to the console
-    def t2m_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None):
+    def t2m_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID):
         output_dir = f"{directory}/t2m_{request_id}"
-        motion_desc = motion_desc.replace(",", " ")
+        motion_desc = motion_desc.replace(",", " then")
         print(f"[t2m subprocess] using motion description: {motion_desc}")
         command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
         final_render_command = f"cd {T2M_DIR} && {T2M_PYTHON} render_final.py --filedir {directory} --motion-list 1"
