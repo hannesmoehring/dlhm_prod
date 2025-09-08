@@ -54,12 +54,15 @@ async def upload_model(model: UploadFile) -> uuid.UUID:
 # Example:
 # curl "http://localhost:8000/generate/?motion_description=some_description&model_id=some_model_id&durations[]=1.0&durations[]=2.0"
 @app.get("/generate/", response_model=uuid.UUID)
-async def generate(motion_description: str, model_id: Optional[str] = None, durations: Optional[list[float]] = Query(default=None)) -> uuid.UUID:
+async def generate(motion_description: str, model_id: Optional[str] = None, durs: Optional[str] = Query(None)) -> uuid.UUID:
     request_id = uuid.uuid4()
     status_store[request_id] = dlhm_types.RequestStatus.REQUEST_RECEIVED
     if (model_id is not None) and (not mh.check_model_storage(model_id=uuid.UUID(model_id))):
         raise HTTPException(status_code=400, detail="Bad model_id")
-
+    if durs is not None:
+        durations = [float(x) for x in durs.split(",")]
+    else:
+        durations = []
     asyncio.create_task(
         mh.generate(
             motion_desc=motion_description,
