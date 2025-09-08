@@ -124,7 +124,7 @@ class ModelHandler:
     # and streams the output to the console
     def t2m_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None):
         output_dir = f"{directory}/t2m_{request_id}"
-        motion_desc = motion_desc.replace(";", "")
+        motion_desc = motion_desc.replace(";", " ")
         print(f"[t2m subprocess] using motion description: {motion_desc}")
         command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
         final_render_command = f"cd {T2M_DIR} && {T2M_PYTHON} render_final.py --filedir {directory} --motion-list 1"
