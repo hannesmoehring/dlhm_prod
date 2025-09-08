@@ -160,8 +160,7 @@ src/output/<request_id>/
 ## Caveats
 
 - Model Upload is supported for SMPL Models via the model_upload endpoint
-  - `curl -X POST "http://localhost:8000/upload_model/" \
--F "model=@SMPL_NEUTRAL.pkl"
+  - `curl -X POST "http://localhost:8000/upload_model/" -F "model=@SMPL_NEUTRAL.pkl"
 `
   - But due to the complex structure of TEACH and other projects, this is fragile.
 - Unfortunately, there was no reliable way found to quantitavely measure the quality of single outputs.

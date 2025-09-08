@@ -36,7 +36,7 @@ os.makedirs(MODEL_STORAGE_DIR, exist_ok=True)
 
 
 class ModelHandler:
-    async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = []):
+    async def generate(self, motion_desc: str, request_id: uuid.UUID, status_store, model_id=None, durations: list[float] = [5]):
         status_store[request_id] = dlhm_types.RequestStatus.GENERATION_STARTED
         req_output_dir = OUTPUT_DIR + f"/{request_id}"
         os.makedirs(req_output_dir)
@@ -68,11 +68,16 @@ class ModelHandler:
 
     # TEACH handler, calls the interact_teach.py script with subprocess
     # and streams the output to the console
-    def teach_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None, durations: list[float] = []):
+    def teach_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None, durations: list[float] = [5]):
         script_name = "interact_teach.py"
         output_dir = f"{directory}/teach_{request_id}"
         motion_duration = 5
-        command_str = f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='[{motion_desc}]' durs='[{motion_duration}]'"
+        print(f"[teach subprocess] using motion description: {motion_desc}")
+        print(f"[teach subprocess] using duration: {durations}")
+        motion_info = motion_desc.split(";")
+        command_str = (
+            f"cd {TEACH_DIR} && {TEACH_PYTHON} {script_name} folder=../baseline/17l8a1tq output={output_dir} texts='{motion_info}' durs='{durations}'"
+        )
 
         process = subprocess.Popen(
             command_str,
@@ -106,6 +111,8 @@ class ModelHandler:
     # and streams the output to the console
     def t2m_handler(self, motion_desc: str, directory: str, request_id: uuid.UUID, model_id=None):
         output_dir = f"{directory}/t2m_{request_id}"
+        motion_desc = motion_desc.replace(";", "")
+        print(f"[t2m subprocess] using motion description: {motion_desc}")
         command_str = f'cd {T2M_DIR} && {T2M_PYTHON} run_t2m.py "{motion_desc}" {output_dir}'
         final_render_command = f"cd {T2M_DIR} && {T2M_PYTHON} render_final.py --filedir {directory} --motion-list 1"
         process = subprocess.Popen(
