@@ -77,10 +77,10 @@ class ModelHandler:
         motion_duration = 2  # default duration per motion segment
 
         motion_desc = motion_desc.replace("_", " ")
-        if "," in motion_desc:
-            motion_info = motion_desc.split(",")
-        else:
-            motion_info = [motion_desc]
+        # if "," in motion_desc:
+        #     motion_info = motion_desc.split(",")
+        # else:
+        motion_info = [motion_desc]
 
         if len(durations) != len(motion_info):
             print(
